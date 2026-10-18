@@ -2,7 +2,7 @@
 
 **Candidate:** Abdullah Malik
 **Role:** Full Stack Product Engineer, Ajaia
-**Live URL:** LIVE_URL_PLACEHOLDER
+**Live URL:** https://ajaia-collab-docs-tau.vercel.app
 **Repository:** https://github.com/abdullah-malik-dev/ajaia-collab-docs (private; access on request)
 
 ## Contents of this folder

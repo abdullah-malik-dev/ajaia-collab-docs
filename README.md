@@ -1,5 +1,7 @@
 # Ajaia Docs
 
+Live demo: https://ajaia-collab-docs-tau.vercel.app
+
 A lightweight collaborative document editor in the spirit of Google Docs: create, edit and share rich-text documents with viewer or editor access, autosave with conflict detection, and import from `.txt`, `.md` and `.docx`.
 
 Built for the Ajaia Full Stack Product Engineer take-home. See [ARCHITECTURE.md](ARCHITECTURE.md) for design decisions, [AI_WORKFLOW.md](AI_WORKFLOW.md) for how AI tooling was used, and [SUBMISSION.md](SUBMISSION.md) for the submission checklist.
