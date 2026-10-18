@@ -4,7 +4,7 @@ import type { User } from "@/db/schema";
 
 export function AppHeader({ user, children }: { user: User; children?: React.ReactNode }) {
   return (
-    <header className="border-b border-line bg-paper">
+    <header className="border-b border-line bg-paper print:hidden">
       <div className="mx-auto flex h-14 max-w-page items-center gap-6 px-6">
         <Link href="/" className="font-semibold tracking-tight hover:text-accent">
           Ajaia Docs

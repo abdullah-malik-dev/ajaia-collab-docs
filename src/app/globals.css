@@ -56,3 +56,14 @@
   content: attr(data-placeholder);
   @apply pointer-events-none float-left h-0 text-ink-faint;
 }
+
+@media print {
+  html {
+    background: #fff;
+  }
+  .tiptap-editor {
+    min-height: 0;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+}

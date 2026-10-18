@@ -7,6 +7,7 @@ import type { DocContent } from "@/db/schema";
 import { api } from "@/lib/client-api";
 import { baseExtensions } from "@/lib/editor-extensions";
 import { TITLE_MAX } from "@/lib/validation";
+import { DownloadMenu } from "./DownloadMenu";
 import { Toolbar } from "./Toolbar";
 import { useAutosave, type SaveStatus } from "./useAutosave";
 
@@ -29,7 +30,7 @@ const extensions = [...baseExtensions(), Placeholder.configure({ placeholder: "S
 
 export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
   const [title, setTitle] = useState(doc.title);
-  const { status, errorMessage, queue, flush, reset, hasUnsavedChanges } = useAutosave(doc.id, doc.updatedAt);
+  const { status, errorMessage, lastSavedAt, queue, flush, reset, hasUnsavedChanges } = useAutosave(doc.id, doc.updatedAt);
 
   const editor = useEditor({
     extensions,
@@ -68,7 +69,7 @@ export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
-      <div className="sticky top-0 z-10 border-b border-line bg-paper">
+      <div className="print:hidden sticky top-0 z-10 border-b border-line bg-paper">
         <div className="mx-auto max-w-page px-6 pt-4">
           <div className="flex items-center gap-4">
             <input
@@ -82,10 +83,11 @@ export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
               className="min-w-0 flex-1 bg-transparent text-xl font-semibold tracking-tight placeholder:text-ink-faint focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 read-only:cursor-default"
             />
             {canEdit ? (
-              <StatusLabel status={status} errorMessage={errorMessage} onRetry={flush} />
+              <StatusLabel status={status} errorMessage={errorMessage} lastSavedAt={lastSavedAt} onRetry={flush} />
             ) : (
               <span className="shrink-0 text-sm text-ink-muted">View only</span>
             )}
+            <DownloadMenu editor={editor} title={title || DEFAULT_TITLE} />
           </div>
           <div className="mt-2 pb-2">
             {canEdit && editor ? (
@@ -102,8 +104,8 @@ export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
         )}
       </div>
 
-      <div className="flex-1 px-4 py-8 sm:px-6">
-        <div className="mx-auto min-h-[60vh] max-w-page rounded-sm border border-line bg-paper px-8 py-10 sm:px-16 sm:py-14">
+      <div className="flex-1 px-4 py-8 sm:px-6 print:p-0">
+        <div className="mx-auto min-h-[60vh] max-w-page rounded-sm border border-line bg-paper px-8 py-10 sm:px-16 sm:py-14 print:min-h-0 print:max-w-none print:border-0 print:p-0">
           <EditorContent editor={editor} />
         </div>
       </div>
@@ -115,16 +117,22 @@ export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
 function StatusLabel({
   status,
   errorMessage,
+  lastSavedAt,
   onRetry,
 }: {
   status: SaveStatus;
   errorMessage: string | null;
+  lastSavedAt: string;
   onRetry: () => void;
 }) {
   const base = "shrink-0 text-sm";
   switch (status) {
     case "saved":
-      return <span className={`${base} text-ink-faint`}>Saved</span>;
+      return (
+        <span className={`${base} text-ink-faint`} title={new Date(lastSavedAt).toLocaleString()}>
+          Saved <SavedTime iso={lastSavedAt} />
+        </span>
+      );
     case "dirty":
       return <span className={`${base} text-ink-faint`}>Unsaved changes</span>;
     case "saving":
@@ -141,6 +149,15 @@ function StatusLabel({
     case "conflict":
       return <span className={`${base} text-danger`}>Not saved</span>;
   }
+}
+
+/** Rendered after mount only: the local time differs between server and browser. */
+function SavedTime({ iso }: { iso: string }) {
+  const [text, setText] = useState("");
+  useEffect(() => {
+    setText(new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }));
+  }, [iso]);
+  return <>{text}</>;
 }
 
 function ConflictBanner({ onReload }: { onReload: () => Promise<void> }) {

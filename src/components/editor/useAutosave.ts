@@ -19,6 +19,7 @@ export const AUTOSAVE_DELAY_MS = 800;
 export function useAutosave(docId: string, initialUpdatedAt: string) {
   const [status, setStatus] = useState<SaveStatus>("saved");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState<string>(initialUpdatedAt);
 
   const baseRef = useRef(initialUpdatedAt);
   const pendingRef = useRef<Patch>({});
@@ -50,6 +51,7 @@ export function useAutosave(docId: string, initialUpdatedAt: string) {
         json: { ...patch, baseUpdatedAt: baseRef.current },
       });
       baseRef.current = saved.updatedAt;
+      setLastSavedAt(saved.updatedAt);
       inflightRef.current = false;
       const more = pendingRef.current;
       if (more.title !== undefined || more.content !== undefined) {
@@ -88,6 +90,7 @@ export function useAutosave(docId: string, initialUpdatedAt: string) {
       if (timerRef.current) clearTimeout(timerRef.current);
       pendingRef.current = {};
       baseRef.current = updatedAt;
+      setLastSavedAt(updatedAt);
       setErrorMessage(null);
       update("saved");
     },
@@ -113,5 +116,5 @@ export function useAutosave(docId: string, initialUpdatedAt: string) {
     [],
   );
 
-  return { status, errorMessage, queue, flush, reset, hasUnsavedChanges };
+  return { status, errorMessage, lastSavedAt, queue, flush, reset, hasUnsavedChanges };
 }
