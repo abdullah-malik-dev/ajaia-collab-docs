@@ -12,3 +12,6 @@ Format: `time | step | accepted/changed/rejected | note`
 - 01:15 | step 1 | accepted | DB layer: Drizzle schema, getDb() singleton (PGlite when DATABASE_URL unset, Neon otherwise), CREATE TABLE IF NOT EXISTS + seed on first use. Verified on in-memory PGlite.
 - 01:25 | step 1 | accepted | Mock auth: httpOnly cookie with seeded user id, edge middleware (presence check only, 401 JSON for /api), /login page with server actions. Verified sign-in/out and redirects in browser.
 - 01:25 | design | accepted | Visual direction: cool grey canvas, paper white, single Source Sans 3 family, one muted ink-blue accent, no shadowed cards. Tokens in tailwind.config.ts.
+- 01:50 | step 2 | accepted | access.ts pure role rules; ServiceError -> HTTP status mapping; route() wrapper gives one JSON error shape; zod v4 schemas (title 1-200, content ~1 MB cap, baseUpdatedAt ISO).
+- 01:50 | step 2 | accepted | documents service: list owned/shared with owner name, create, get-with-role (no access = 404), update with 409 conflict guarded by a conditional UPDATE, delete owner-only (403 for editors/viewers).
+- 01:55 | step 2 | accepted | Dashboard: two sections, role badge, hover Rename/Delete on owned rows, empty states; verified create, rename, delete, 400/403/404/409 via browser and curl.
