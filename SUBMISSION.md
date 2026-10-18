@@ -4,6 +4,7 @@
 **Role:** Full Stack Product Engineer, Ajaia
 **Live URL:** https://ajaia-collab-docs-tau.vercel.app
 **Repository:** https://github.com/abdullah-malik-dev/ajaia-collab-docs (private; access on request)
+**Drive folder:** https://drive.google.com/drive/folders/1mLSF0J_RbFJ60g8wAjflM0TwGUBZlHa0?usp=sharing
 **Walkthrough video:** https://www.loom.com/share/a622b55301934d64b372e1c5e65d8d31
 
 ## Contents of this folder
