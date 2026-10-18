@@ -32,6 +32,11 @@ async function createDb(): Promise<Db> {
     const { drizzle } = await import("drizzle-orm/neon-http");
     return drizzle(neon(url), { schema }) as unknown as Db;
   }
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    throw new Error(
+      "DATABASE_URL is not set. Attach a Postgres database (for example Neon from the Vercel Storage tab) and redeploy.",
+    );
+  }
   const { PGlite } = await import("@electric-sql/pglite");
   const { drizzle } = await import("drizzle-orm/pglite");
   const dataDir = process.env.PGLITE_DATA_DIR ?? "./.data";
