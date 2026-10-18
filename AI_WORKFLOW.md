@@ -33,5 +33,5 @@ I set the scope, the order of steps and the time budget up front (scaffold, DB a
 
 - Every step was exercised in the browser as different users: sign-in and sign-out, create, rename, delete, typing with the save status visible, a forced 409 by editing as Alice through the API while Bob had the document open, "Reload latest", Carol's read-only view, the share dialog with an unknown email, import of `.md`, `.txt` and a hand-built `.docx`, and the Download menu.
 - Every API error path was hit with `curl` and the responses checked.
-- `npm test` (39 tests), `npm run lint`, `npx tsc --noEmit` and `npm run build` all pass.
+- `npm test` (40 tests), `npm run lint`, `npx tsc --noEmit` and `npm run build` all pass.
 - The production deployment was checked by signing in and editing on the live URL.

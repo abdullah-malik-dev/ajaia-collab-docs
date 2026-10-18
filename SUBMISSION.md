@@ -39,7 +39,7 @@ Suggested walkthrough: sign in as Alice, open Welcome, share it; in a private wi
 - Access requests: viewers can ask for edit access, link holders can ask to view or edit, owner approves or declines in the Share dialog
 - Import of `.txt`, `.md`, `.docx` up to 2 MB as new documents; clear errors for other types and sizes
 - Download as Markdown or HTML; print or save as PDF
-- 39 Vitest tests; production build; deployed on Vercel with Neon Postgres
+- 40 Vitest tests; production build; deployed on Vercel with Neon Postgres
 
 ## Incomplete or simplified
 
