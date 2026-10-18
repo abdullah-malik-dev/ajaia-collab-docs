@@ -57,11 +57,14 @@ async function seedIfEmpty(db: Db) {
   if (existing.length > 0) return;
 
   await db.insert(users).values([...SEED_USERS]);
+  const now = new Date();
   await db.insert(documents).values({
     id: WELCOME_DOC_ID,
     title: "Welcome",
     content: welcomeContent(),
     ownerId: SEED_USERS[0].id,
+    createdAt: now,
+    updatedAt: now,
   });
   await db.insert(documentShares).values([
     { documentId: WELCOME_DOC_ID, userId: SEED_USERS[1].id, role: "editor" },

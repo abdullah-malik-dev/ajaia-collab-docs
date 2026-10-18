@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { documentShares, documents, users, type DocContent, type Document, type ShareRole } from "@/db/schema";
 import { canDelete, canEdit, resolveRole, type Role } from "@/lib/access";
@@ -54,6 +54,10 @@ export async function listDocumentsForUser(db: Db, userId: string) {
 }
 
 export async function createDocument(db: Db, ownerId: string, input: { title?: string; content?: DocContent }) {
+  // Timestamps are set here, not by the database default: Postgres keeps
+  // microseconds, JavaScript keeps milliseconds, and the concurrency check
+  // compares the two. Millisecond values round-trip exactly.
+  const now = new Date();
   const [doc] = await db
     .insert(documents)
     .values({
@@ -61,6 +65,8 @@ export async function createDocument(db: Db, ownerId: string, input: { title?: s
       title: input.title ?? "Untitled document",
       content: input.content ?? EMPTY_CONTENT,
       ownerId,
+      createdAt: now,
+      updatedAt: now,
     })
     .returning();
   return doc;
@@ -97,8 +103,13 @@ export async function updateDocument(db: Db, docId: string, userId: string, inpu
   if (input.content !== undefined) patch.content = input.content;
 
   // Guard against a save that lands between the check above and this write.
+  // Compare at millisecond precision: the stored value may carry microseconds
+  // (seeded or default rows) while the client only ever sees milliseconds.
   const where = input.baseUpdatedAt
-    ? and(eq(documents.id, docId), eq(documents.updatedAt, doc.updatedAt))
+    ? and(
+        eq(documents.id, docId),
+        sql`date_trunc('milliseconds', ${documents.updatedAt}) = ${doc.updatedAt}`,
+      )
     : eq(documents.id, docId);
   const [updated] = await db.update(documents).set(patch).where(where).returning();
   if (!updated) {

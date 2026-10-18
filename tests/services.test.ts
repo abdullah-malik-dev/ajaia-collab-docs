@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { createTestDb, type Db } from "@/db/client";
 import { SEED_USERS } from "@/db/bootstrap";
@@ -81,6 +82,20 @@ describe("concurrent edits", () => {
 
     const second = await updateDocument(db, doc.id, alice.id, { title: "Spec B", baseUpdatedAt: first.updatedAt.toISOString() });
     expect(second.title).toBe("Spec B");
+  });
+
+  it("saves against a row whose timestamp has microsecond precision (real Postgres default)", async () => {
+    const doc = await createDocument(db, alice.id, { title: "Precise" });
+    // Simulate a row written by the database default now(), which keeps microseconds.
+    await db.execute(sql`UPDATE documents SET updated_at = '2026-01-01T10:20:30.123456Z' WHERE id = ${doc.id}`);
+    const { doc: reread } = await getDocumentForUser(db, doc.id, alice.id);
+    expect(reread.updatedAt.toISOString()).toBe("2026-01-01T10:20:30.123Z");
+
+    const saved = await updateDocument(db, doc.id, alice.id, {
+      title: "Precise, saved",
+      baseUpdatedAt: reread.updatedAt.toISOString(),
+    });
+    expect(saved.title).toBe("Precise, saved");
   });
 
   it("round-trips content JSON exactly", async () => {
