@@ -9,3 +9,6 @@ Format: `time | step | accepted/changed/rejected | note`
 - 00:30 | setup | accepted | Installed gh CLI via winget; device login handed to user to complete manually in the personal account.
 - 00:40 | step 1 | accepted | Next.js 14 scaffold (App Router, TS, Tailwind, src dir) committed; deps installed. npm resolved TipTap v3 (not v2) and zod v4; flagged for decision.
 - 00:45 | step 1 | changed | @types/node bumped 20 -> 22 to satisfy vitest peer dep; @types/mammoth dropped (mammoth ships its own types).
+- 01:15 | step 1 | accepted | DB layer: Drizzle schema, getDb() singleton (PGlite when DATABASE_URL unset, Neon otherwise), CREATE TABLE IF NOT EXISTS + seed on first use. Verified on in-memory PGlite.
+- 01:25 | step 1 | accepted | Mock auth: httpOnly cookie with seeded user id, edge middleware (presence check only, 401 JSON for /api), /login page with server actions. Verified sign-in/out and redirects in browser.
+- 01:25 | design | accepted | Visual direction: cool grey canvas, paper white, single Source Sans 3 family, one muted ink-blue accent, no shadowed cards. Tokens in tailwind.config.ts.
