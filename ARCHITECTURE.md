@@ -16,6 +16,7 @@ Three decisions shaped everything else:
 users            id uuid PK, name, email UNIQUE
 documents        id uuid PK, title, content jsonb, owner_id -> users, created_at, updated_at
 document_shares  (document_id -> documents, user_id -> users) PK, role 'viewer' | 'editor'
+access_requests  (document_id, user_id) PK, requested_role, status 'pending' | 'approved' | 'declined', created_at
 ```
 
 - `content` is the editor's own JSON (TipTap / ProseMirror). Storing the document model rather than HTML means formatting round-trips exactly, the server can validate shape and size, and exports are generated from one source of truth.
@@ -32,7 +33,8 @@ document_shares  (document_id -> documents, user_id -> users) PK, role 'viewer' 
 | Viewer  | yes  | no                     | no             | no     |
 | Nobody  | 404  | 404                    | 404            | 404    |
 
-- A user with no access gets 404, not 403, so document ids can't be probed for existence.
+- A user with no access gets 404 from the API, so ids can't be probed programmatically. The document page is the one place that distinguishes "doesn't exist" from "not shared with you": a signed-in user who lands on a real document's URL sees a "You need access" page with a request form, the same trade-off Google Docs makes for people holding a link.
+- **Access requests** flow one way: anyone signed in can ask for `viewer` or `editor` (one open request per user per document, re-asking reopens it), the owner approves or declines from the Share dialog, and approving is an upsert into `document_shares` at the requested role. Asking for a role you already have, or for your own document, is rejected.
 - A viewer attempting an edit gets 403 with a plain-language message. The UI never shows them an editable surface in the first place, but the server does not trust the UI.
 - Authentication is a mock by design: an httpOnly cookie holds a seeded user id. The edge middleware only checks the cookie exists (it can't reach the database); pages and routes verify the user. Swapping in real auth means replacing `getCurrentUser()` in `src/lib/session.ts`.
 
@@ -70,8 +72,9 @@ Conversion happens server-side in `src/server/import.ts`: the file is turned int
 
 ## What I would do with 2 to 4 more hours
 
-1. **Presence and live updates without full co-editing**: poll or subscribe to `updated_at` so a viewer sees new content without reloading, and an editor learns about a conflict before they type into it.
-2. **Real authentication** (NextAuth or Clerk) replacing the cookie, with the seeded users becoming real accounts.
-3. **Drizzle migrations** instead of create-if-not-exists, and a `createdAt`-ordered activity line on the dashboard.
-4. **Version history**: snapshot `content` on every save into a `document_versions` table and show a restore list. The data model already makes this a single insert.
-5. **Playwright smoke test** for the two-user conflict flow, which today is verified by hand.
+1. **Notifications for access requests** (email or an in-app inbox) so owners don't have to open the Share dialog to see them.
+2. **Presence and live updates without full co-editing**: poll or subscribe to `updated_at` so a viewer sees new content without reloading, and an editor learns about a conflict before they type into it.
+3. **Real authentication** (NextAuth or Clerk) replacing the cookie, with the seeded users becoming real accounts.
+4. **Drizzle migrations** instead of create-if-not-exists, and a `createdAt`-ordered activity line on the dashboard.
+5. **Version history**: snapshot `content` on every save into a `document_versions` table and show a restore list. The data model already makes this a single insert.
+6. **Playwright smoke test** for the two-user conflict flow, which today is verified by hand.

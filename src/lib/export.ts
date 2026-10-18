@@ -74,6 +74,7 @@ function inline(nodes: Node[]): string {
       if (has("italic")) t = `_${t}_`;
       if (has("strike")) t = `~~${t}~~`;
       if (has("underline")) t = `<u>${t}</u>`;
+      if (has("highlight")) t = `<mark>${t}</mark>`;
       const link = marks.find((m) => m.type === "link");
       if (link && typeof link.attrs?.href === "string") t = `[${t}](${link.attrs.href})`;
       return t;
@@ -98,6 +99,7 @@ export function wrapHtmlDocument(title: string, bodyHtml: string): string {
   pre { background: #edeff2; padding: 1rem; border-radius: 4px; overflow-x: auto; } pre code { background: none; padding: 0; }
   hr { border: 0; border-top: 1px solid #d8dde3; margin: 2rem 0; }
   a { color: #2e5c8a; }
+  mark { padding: 0 0.1em; border-radius: 2px; }
 </style>
 </head>
 <body>

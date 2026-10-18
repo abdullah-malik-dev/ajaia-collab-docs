@@ -28,24 +28,26 @@ No passwords. Pick a person on the login page.
 | Bob   | bob@ajaia.test   | Editor                  |
 | Carol | carol@ajaia.test | Viewer                  |
 
-Suggested walkthrough: sign in as Alice, open Welcome, share it; in a private window sign in as Bob, edit the same document, then save from both sides to see the conflict banner; sign in as Carol to see read-only mode; import a `.md` file from the dashboard.
+Suggested walkthrough: sign in as Alice, open Welcome, share it; in a private window sign in as Bob, edit the same document, then save from both sides to see the conflict banner; sign in as Carol to see read-only mode and click "Request edit access"; back as Alice, approve it from the Share dialog; import a `.md` file from the dashboard.
 
 ## Working
 
 - Mock sign-in, dashboard with owned and shared documents, create, inline rename, delete
-- Rich-text editor (headings, bold, italic, underline, strikethrough, code, links, lists, quotes, code blocks, rules, undo/redo), word count
+- Rich-text editor (headings, bold, italic, underline, strikethrough, code, links, highlight colours, text alignment, lists, quotes, code blocks, rules, undo/redo), word count
 - Autosave with status and last saved time, 409 conflict detection with "Reload latest", unsaved-changes warning
 - Sharing by email as viewer or editor, role changes, removal; all rules enforced server-side
+- Access requests: viewers can ask for edit access, link holders can ask to view or edit, owner approves or declines in the Share dialog
 - Import of `.txt`, `.md`, `.docx` up to 2 MB as new documents; clear errors for other types and sizes
 - Download as Markdown or HTML; print or save as PDF
-- 29 Vitest tests; production build; deployed on Vercel with Neon Postgres
+- 36 Vitest tests; production build; deployed on Vercel with Neon Postgres
 
 ## Incomplete or simplified
 
 - Authentication is a mock (seeded users, unsigned cookie)
 - PDF export is the browser's print dialog, not a server-generated file
 - On a conflict, local unsaved edits are discarded when reloading; there is no merge
-- Tables, images, colours and text alignment are not supported in the editor or on import
+- Tables, images and font colours are not supported in the editor or on import
+- Access requests are visible only when the owner opens the Share dialog; there is no notification
 
 ## Deliberately cut
 

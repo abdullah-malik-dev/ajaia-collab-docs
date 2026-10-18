@@ -51,6 +51,17 @@ describe("markdown import", () => {
   });
 });
 
+describe("highlight and alignment", () => {
+  it("round-trips <mark> and text-align through the shared schema", async () => {
+    const html = '<p style="text-align: center">Centered <mark>hot</mark></p>';
+    const { htmlToDoc } = await import("@/server/import");
+    const doc = htmlToDoc(html);
+    const para = (doc.content as Node[])[0];
+    expect(para.attrs?.textAlign).toBe("center");
+    expect(para.content!.find((t) => t.text === "hot")?.marks?.[0]).toMatchObject({ type: "highlight" });
+  });
+});
+
 describe("plain text import", () => {
   it("escapes HTML and splits paragraphs on blank lines", () => {
     expect(plainTextToHtml("a <b>x</b>\nb\n\nc & d")).toBe("<p>a &lt;b&gt;x&lt;/b&gt;<br>b</p><p>c &amp; d</p>");
@@ -63,7 +74,9 @@ describe("plain text import", () => {
   });
   it("gives an empty file one empty paragraph", async () => {
     const { content } = await convertUpload({ name: "empty.txt", bytes: enc.encode("  \n ") });
-    expect(content.content).toEqual([{ type: "paragraph" }]);
+    expect(content.content).toHaveLength(1);
+    expect(content.content![0]).toMatchObject({ type: "paragraph" });
+    expect((content.content![0] as Node).content).toBeUndefined();
   });
 });
 

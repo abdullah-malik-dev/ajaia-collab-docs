@@ -29,6 +29,15 @@ export async function bootstrap(db: Db) {
       role text NOT NULL CHECK (role IN ('viewer', 'editor')),
       PRIMARY KEY (document_id, user_id)
     )`);
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS access_requests (
+      document_id uuid NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+      user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      requested_role text NOT NULL CHECK (requested_role IN ('viewer', 'editor')),
+      status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'declined')),
+      created_at timestamptz NOT NULL DEFAULT now(),
+      PRIMARY KEY (document_id, user_id)
+    )`);
   await db.execute(sql`CREATE INDEX IF NOT EXISTS documents_owner_idx ON documents(owner_id)`);
   await db.execute(sql`CREATE INDEX IF NOT EXISTS document_shares_user_idx ON document_shares(user_id)`);
 

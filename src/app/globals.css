@@ -70,6 +70,9 @@
 .tiptap-editor a {
   @apply text-accent underline decoration-accent/40 underline-offset-2;
 }
+.tiptap-editor mark {
+  @apply rounded-sm px-0.5;
+}
 .tiptap-editor s {
   @apply text-ink-muted;
 }

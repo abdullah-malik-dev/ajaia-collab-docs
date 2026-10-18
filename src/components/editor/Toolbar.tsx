@@ -2,8 +2,13 @@
 
 import { useEditorState, type Editor } from "@tiptap/react";
 import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
   Bold,
   Code,
+  Highlighter,
   Italic,
   Link,
   List,
@@ -17,7 +22,8 @@ import {
   Undo2,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { HIGHLIGHT_COLORS } from "@/lib/editor-extensions";
 
 type State = ReturnType<typeof select>;
 
@@ -42,6 +48,19 @@ function select({ editor: e }: { editor: Editor }) {
           : "0",
     canUndo: e.can().undo(),
     canRedo: e.can().redo(),
+    highlight: e.isActive("highlight"),
+    highlightColor: (e.getAttributes("highlight").color as string | undefined) ?? null,
+    align: e.isActive({ textAlign: "center" })
+      ? "center"
+      : e.isActive({ textAlign: "right" })
+        ? "right"
+        : e.isActive({ textAlign: "justify" })
+          ? "justify"
+          : "left",
+    alignCenter: e.isActive({ textAlign: "center" }),
+    alignRight: e.isActive({ textAlign: "right" }),
+    alignJustify: e.isActive({ textAlign: "justify" }),
+    alignLeft: !e.isActive({ textAlign: "center" }) && !e.isActive({ textAlign: "right" }) && !e.isActive({ textAlign: "justify" }),
   };
 }
 
@@ -69,6 +88,13 @@ const BLOCKS: Item[] = [
   { icon: Minus, title: "Horizontal rule", run: (e) => e.chain().focus().setHorizontalRule().run() },
 ];
 
+const ALIGN: Item[] = [
+  { icon: AlignLeft, title: "Align left (Ctrl+Shift+L)", active: "alignLeft", run: (e) => e.chain().focus().setTextAlign("left").run() },
+  { icon: AlignCenter, title: "Align center (Ctrl+Shift+E)", active: "alignCenter", run: (e) => e.chain().focus().setTextAlign("center").run() },
+  { icon: AlignRight, title: "Align right (Ctrl+Shift+R)", active: "alignRight", run: (e) => e.chain().focus().setTextAlign("right").run() },
+  { icon: AlignJustify, title: "Justify (Ctrl+Shift+J)", active: "alignJustify", run: (e) => e.chain().focus().setTextAlign("justify").run() },
+];
+
 const HISTORY: Item[] = [
   { icon: Undo2, title: "Undo (Ctrl+Z)", enabled: "canUndo", run: (e) => e.chain().focus().undo().run() },
   { icon: Redo2, title: "Redo (Ctrl+Y)", enabled: "canRedo", run: (e) => e.chain().focus().redo().run() },
@@ -78,6 +104,17 @@ export function Toolbar({ editor }: { editor: Editor }) {
   const state = useEditorState({ editor, selector: select });
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [highlightOpen, setHighlightOpen] = useState(false);
+  const highlightRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!highlightOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (!highlightRef.current?.contains(e.target as Node)) setHighlightOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [highlightOpen]);
 
   function openLink() {
     setLinkUrl((editor.getAttributes("link").href as string | undefined) ?? "");
@@ -124,6 +161,50 @@ export function Toolbar({ editor }: { editor: Editor }) {
           {MARKS.map((item) => (
             <IconButton key={item.title} item={item} state={state} editor={editor} />
           ))}
+          <div ref={highlightRef} className="relative">
+            <button
+              type="button"
+              title="Highlight (Ctrl+Shift+H)"
+              aria-label="Highlight"
+              aria-pressed={state.highlight}
+              aria-expanded={highlightOpen}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setHighlightOpen((o) => !o)}
+              className={btnClass(state.highlight)}
+            >
+              <Highlighter size={16} strokeWidth={2} />
+            </button>
+            {highlightOpen && (
+              <div className="absolute left-0 top-full z-20 mt-1 flex items-center gap-1 rounded border border-line bg-paper p-1.5">
+                {HIGHLIGHT_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    title={c.name}
+                    aria-label={`Highlight ${c.name.toLowerCase()}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      editor.chain().focus().setHighlight({ color: c.value }).run();
+                      setHighlightOpen(false);
+                    }}
+                    className={`h-6 w-6 rounded-sm border ${state.highlightColor === c.value ? "border-ink" : "border-line-strong"}`}
+                    style={{ backgroundColor: c.value }}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    editor.chain().focus().unsetHighlight().run();
+                    setHighlightOpen(false);
+                  }}
+                  className="ml-1 px-1.5 text-xs text-ink-muted hover:text-ink"
+                >
+                  None
+                </button>
+              </div>
+            )}
+          </div>
           <button
             type="button"
             title="Link (Ctrl+K)"
@@ -135,6 +216,11 @@ export function Toolbar({ editor }: { editor: Editor }) {
           >
             <Link size={16} strokeWidth={2} />
           </button>
+        </Group>
+        <Group>
+          {ALIGN.map((item) => (
+            <IconButton key={item.title} item={item} state={state} editor={editor} />
+          ))}
         </Group>
         <Group last>
           {BLOCKS.map((item) => (

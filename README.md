@@ -42,10 +42,11 @@ Open the app in two browsers (or one normal and one private window) as different
 ## What it does
 
 - **Dashboard**: "My documents" and "Shared with me" (owner name and role badge), create, rename inline, delete.
-- **Editor**: headings, bold, italic, underline, strikethrough, inline code, links, bullet and numbered lists, quotes, code blocks, horizontal rules, undo and redo. Word count.
+- **Editor**: headings, bold, italic, underline, strikethrough, inline code, links, highlight colours, text alignment, bullet and numbered lists, quotes, code blocks, horizontal rules, undo and redo. Word count.
 - **Autosave**: saves 800 ms after you stop typing, with Saved / Saving / Unsaved / Error states and the last saved time. The browser warns before you close a tab with unsaved changes.
 - **Conflict detection**: every save carries the timestamp the editor last saw. If someone else saved in between, the server answers 409 and the editor offers "Reload latest".
 - **Sharing**: the owner shares by email as Viewer or Editor, can change roles and remove people. Viewers get a read-only editor.
+- **Access requests**: a viewer can ask for edit access, and anyone with a document link can ask to view or edit. The owner sees requests in the Share dialog and approves or declines; approving grants the requested role.
 - **Import**: `.txt`, `.md` and `.docx` files up to 2 MB become new, editable documents.
 - **Download**: Markdown, HTML, or "Print or save as PDF" through the browser's print dialog.
 
@@ -57,7 +58,7 @@ Open the app in two browsers (or one normal and one private window) as different
 | `.md`, `.markdown` | Parsed with `marked` (GitHub-flavoured); headings, lists, emphasis, links and code are kept |
 | `.docx`          | Converted with `mammoth`; headings, lists, bold, italic and underline are kept |
 
-Anything the editor can't represent (tables, images, colours) is flattened to text. Other file types are rejected with a clear message, as are files over 2 MB.
+Anything the editor can't represent (tables, images, font colours) is flattened to text. Other file types are rejected with a clear message, as are files over 2 MB.
 
 ## Deploy (Vercel + Neon)
 

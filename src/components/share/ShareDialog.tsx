@@ -6,12 +6,20 @@ import type { ShareRole } from "@/db/schema";
 import { api } from "@/lib/client-api";
 
 type Share = { userId: string; name: string; email: string; role: ShareRole };
+type Request = { userId: string; name: string; email: string; requestedRole: ShareRole };
 
-type Props = { docId: string; docTitle: string; owner: { name: string; email: string } };
+type Props = {
+  docId: string;
+  docTitle: string;
+  owner: { name: string; email: string };
+  /** Open access requests when the page rendered; shown as a count on the button. */
+  pendingCount?: number;
+};
 
-export function ShareButton({ docId, docTitle, owner }: Props) {
+export function ShareButton({ docId, docTitle, owner, pendingCount = 0 }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
+  const [count, setCount] = useState(pendingCount);
 
   return (
     <>
@@ -21,9 +29,17 @@ export function ShareButton({ docId, docTitle, owner }: Props) {
           setOpen(true);
           ref.current?.showModal();
         }}
-        className="rounded border border-line-strong bg-paper px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent"
+        className="inline-flex items-center gap-2 rounded border border-line-strong bg-paper px-3 py-1.5 text-sm font-medium hover:border-accent hover:text-accent"
       >
         Share
+        {count > 0 && (
+          <span
+            className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-xs font-semibold text-paper"
+            title={`${count} access request${count === 1 ? "" : "s"}`}
+          >
+            {count}
+          </span>
+        )}
       </button>
       <dialog
         ref={ref}
@@ -35,6 +51,7 @@ export function ShareButton({ docId, docTitle, owner }: Props) {
             docId={docId}
             docTitle={docTitle}
             owner={owner}
+            onPendingChange={setCount}
             onClose={() => ref.current?.close()}
           />
         )}
@@ -43,8 +60,15 @@ export function ShareButton({ docId, docTitle, owner }: Props) {
   );
 }
 
-function ShareForm({ docId, docTitle, owner, onClose }: Props & { onClose: () => void }) {
+function ShareForm({
+  docId,
+  docTitle,
+  owner,
+  onClose,
+  onPendingChange,
+}: Omit<Props, "pendingCount"> & { onClose: () => void; onPendingChange: (n: number) => void }) {
   const [shares, setShares] = useState<Share[] | null>(null);
+  const [requests, setRequests] = useState<Request[]>([]);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<ShareRole>("editor");
   const [busy, setBusy] = useState(false);
@@ -54,7 +78,13 @@ function ShareForm({ docId, docTitle, owner, onClose }: Props & { onClose: () =>
     api<Share[]>(`/api/documents/${docId}/shares`)
       .then(setShares)
       .catch((e) => setError(e instanceof Error ? e.message : "Couldn't load sharing."));
-  }, [docId]);
+    api<Request[]>(`/api/documents/${docId}/requests`)
+      .then((r) => {
+        setRequests(r);
+        onPendingChange(r.length);
+      })
+      .catch(() => {});
+  }, [docId, onPendingChange]);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -83,6 +113,24 @@ function ShareForm({ docId, docTitle, owner, onClose }: Props & { onClose: () =>
     } catch (err) {
       setShares(prev);
       setError(err instanceof Error ? err.message : "Couldn't remove access.");
+    }
+  }
+
+  async function decide(req: Request, decision: "approve" | "decline") {
+    setError(null);
+    try {
+      await api(`/api/documents/${docId}/requests/${req.userId}`, { method: "PATCH", json: { decision } });
+      const next = requests.filter((r) => r.userId !== req.userId);
+      setRequests(next);
+      onPendingChange(next.length);
+      if (decision === "approve") {
+        setShares((prev) => [
+          ...(prev ?? []).filter((s) => s.userId !== req.userId),
+          { userId: req.userId, name: req.name, email: req.email, role: req.requestedRole },
+        ]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't update the request.");
     }
   }
 
@@ -126,6 +174,38 @@ function ShareForm({ docId, docTitle, owner, onClose }: Props & { onClose: () =>
         </button>
       </form>
       {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+
+      {requests.length > 0 && (
+        <section className="mt-5 rounded border border-accent/30 bg-accent-soft/50 p-3">
+          <h3 className="text-sm font-medium">Access requests</h3>
+          <ul className="mt-2 divide-y divide-line/70">
+            {requests.map((r) => (
+              <li key={r.userId} className="flex items-center justify-between gap-3 py-2 text-sm">
+                <span className="min-w-0 truncate">
+                  <span className="font-medium">{r.name}</span>
+                  <span className="ml-2 text-ink-muted">wants to {r.requestedRole === "editor" ? "edit" : "view"}</span>
+                </span>
+                <span className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => decide(r, "approve")}
+                    className="rounded bg-accent px-2.5 py-1 text-xs font-medium text-paper hover:bg-accent-hover"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => decide(r, "decline")}
+                    className="rounded border border-line-strong px-2.5 py-1 text-xs font-medium text-ink-muted hover:text-ink"
+                  >
+                    Decline
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <ul className="mt-5 divide-y divide-line border-t border-line">
         <li className="flex items-center justify-between py-3 text-sm">

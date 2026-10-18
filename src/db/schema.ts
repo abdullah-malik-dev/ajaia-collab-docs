@@ -31,7 +31,24 @@ export const documentShares = pgTable(
   (t) => ({ pk: primaryKey({ columns: [t.documentId, t.userId] }) }),
 );
 
+export const accessRequests = pgTable(
+  "access_requests",
+  {
+    documentId: uuid("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    requestedRole: text("requested_role").notNull().$type<ShareRole>(),
+    status: text("status").notNull().$type<RequestStatus>().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.documentId, t.userId] }) }),
+);
+
 export type ShareRole = "viewer" | "editor";
+export type RequestStatus = "pending" | "approved" | "declined";
 
 /** TipTap/ProseMirror JSON document. Kept loose on purpose; the editor owns the exact shape. */
 export type DocContent = { type: "doc"; content?: unknown[] };
@@ -39,3 +56,4 @@ export type DocContent = { type: "doc"; content?: unknown[] };
 export type User = typeof users.$inferSelect;
 export type Document = typeof documents.$inferSelect;
 export type DocumentShare = typeof documentShares.$inferSelect;
+export type AccessRequest = typeof accessRequests.$inferSelect;

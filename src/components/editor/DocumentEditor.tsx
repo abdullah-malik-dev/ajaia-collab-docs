@@ -23,13 +23,15 @@ type Props = {
   doc: EditorDoc;
   canEdit: boolean;
   ownerName: string;
+  /** Rendered inside the read-only notice, e.g. a "Request edit access" control. */
+  requestEdit?: React.ReactNode;
 };
 
 const DEFAULT_TITLE = "Untitled document";
 
 const extensions = [...baseExtensions(), Placeholder.configure({ placeholder: "Start writing…" })];
 
-export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
+export function DocumentEditor({ doc, canEdit, ownerName, requestEdit }: Props) {
   const [title, setTitle] = useState(doc.title);
   const { status, errorMessage, lastSavedAt, queue, flush, reset, hasUnsavedChanges } = useAutosave(doc.id, doc.updatedAt);
 
@@ -95,7 +97,7 @@ export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
               <Toolbar editor={editor} />
             ) : (
               <p className="py-1 text-sm text-ink-muted">
-                You can read this document. Ask {ownerName} for edit access to make changes.
+                You can read this document. {requestEdit ?? `Ask ${ownerName} for edit access to make changes.`}
               </p>
             )}
           </div>

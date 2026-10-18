@@ -17,6 +17,8 @@ describe("docToMarkdown", () => {
             { type: "text", marks: [{ type: "bold" }], text: "bold" },
             { type: "text", text: " and " },
             { type: "text", marks: [{ type: "italic" }, { type: "underline" }], text: "both" },
+            { type: "text", text: " " },
+            { type: "text", marks: [{ type: "highlight", attrs: { color: "#FFF3A3" } }], text: "hot" },
           ],
         },
         { type: "bulletList", content: [li(p("one")), li(p("two"), { type: "bulletList", content: [li(p("nested"))] })] },
@@ -28,7 +30,7 @@ describe("docToMarkdown", () => {
       [
         "# Title",
         "",
-        "Some **bold** and <u>_both_</u>",
+        "Some **bold** and <u>_both_</u> <mark>hot</mark>",
         "",
         "- one",
         "- two",
