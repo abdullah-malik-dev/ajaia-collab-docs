@@ -29,7 +29,7 @@ To point at a real Postgres instead, copy `.env.example` to `.env.local` and set
 
 ## Seeded users
 
-Sign-in is a mock: you pick a person, no password. Three accounts are seeded so sharing can be seen from each side.
+Sign-in is a mock: you pick a person, no password. Three accounts are seeded so sharing can be seen from each side. You can also add yourself with a name and email on the login page; entering a known email signs you in as that person. Anyone created this way can be shared with by email.
 
 | User  | Email              | On the "Welcome" document |
 | ----- | ------------------ | ------------------------- |

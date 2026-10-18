@@ -26,11 +26,12 @@ I set the scope, the order of steps and the time budget up front (scaffold, DB a
 - **Export and PDF.** I asked for download and PDF after the feature freeze. Claude pushed back on a server-rendered PDF and proposed Markdown and HTML downloads plus browser print-to-PDF. I accepted that version.
 - **Honest critique of the UI.** When I asked whether the UI was top notch, the answer was "clean and competent, not top notch" with a concrete list. I approved the polish pass (icon toolbar, richer formatting, links, word count, serif body for the document, loading skeletons, error page, favicon, touch-visible row actions, mobile fixes) and declined tables and images as a different tier of work. Later I asked for text alignment and highlight colours, which were added through TipTap extensions.
 - **Access requests.** I asked whether viewers could request edit access like Google Docs. Claude estimated 45 to 50 minutes and recommended only documenting it; I corrected the remaining time and chose to build it, including requests from anyone holding a link. Claude flagged that the "You need access" page reveals a document exists and I accepted that trade-off.
+- **Sign-up.** After the audit against the brief I asked why users were only seeded. Claude pointed out the brief allows seeded accounts but that sharing with only three addresses was the weakest moment in the demo, and proposed a no-password sign-up. I approved it as the last feature.
 - **Conflict handling.** I chose to discard local edits on "Reload latest" rather than attempt a merge, since a merge is real-time co-editing by another name.
 
 ## How I verified the work
 
 - Every step was exercised in the browser as different users: sign-in and sign-out, create, rename, delete, typing with the save status visible, a forced 409 by editing as Alice through the API while Bob had the document open, "Reload latest", Carol's read-only view, the share dialog with an unknown email, import of `.md`, `.txt` and a hand-built `.docx`, and the Download menu.
 - Every API error path was hit with `curl` and the responses checked.
-- `npm test` (36 tests), `npm run lint`, `npx tsc --noEmit` and `npm run build` all pass.
+- `npm test` (39 tests), `npm run lint`, `npx tsc --noEmit` and `npm run build` all pass.
 - The production deployment was checked by signing in and editing on the live URL.

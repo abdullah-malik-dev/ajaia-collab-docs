@@ -1,6 +1,8 @@
 import { getDb } from "@/db/client";
 import { listUsers } from "@/server/users";
 import { signInAs } from "./actions";
+import { ContinueButton } from "./ContinueButton";
+import { SignUpForm } from "./SignUpForm";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +12,8 @@ export default async function LoginPage({
   searchParams: { next?: string; error?: string };
 }) {
   const db = await getDb();
-  const users = await listUsers(db);
+  // Only the seeded demo people are listed; everyone else signs in by email below.
+  const users = (await listUsers(db)).filter((u) => u.email.endsWith("@ajaia.test"));
   const next = searchParams.next ?? "/";
 
   return (
@@ -18,8 +21,8 @@ export default async function LoginPage({
       <div className="w-full max-w-sm">
         <h1 className="text-3xl font-semibold tracking-tight">Ajaia Docs</h1>
         <p className="mt-2 text-ink-muted">
-          Pick a person to continue as. This demo has no passwords; the three accounts below are
-          seeded so you can see sharing from each side.
+          Pick a person to continue as, or add yourself below. There are no passwords; the three
+          seeded accounts let you see sharing from each side.
         </p>
 
         {searchParams.error === "unknown-user" && (
@@ -34,18 +37,7 @@ export default async function LoginPage({
               <form action={signInAs}>
                 <input type="hidden" name="userId" value={u.id} />
                 <input type="hidden" name="next" value={next} />
-                <button
-                  type="submit"
-                  className="group flex w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:text-accent"
-                >
-                  <span>
-                    <span className="block text-lg font-medium">{u.name}</span>
-                    <span className="block text-sm text-ink-muted">{u.email}</span>
-                  </span>
-                  <span aria-hidden className="text-ink-faint transition-colors group-hover:text-accent">
-                    Continue
-                  </span>
-                </button>
+                <ContinueButton name={u.name} email={u.email} />
               </form>
             </li>
           ))}
@@ -54,6 +46,8 @@ export default async function LoginPage({
         <p className="mt-6 text-sm text-ink-faint">
           Alice owns the Welcome document. Bob can edit it, Carol can read it.
         </p>
+
+        <SignUpForm next={next} />
       </div>
     </main>
   );

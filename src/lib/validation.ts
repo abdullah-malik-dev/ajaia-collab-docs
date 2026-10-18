@@ -40,6 +40,11 @@ export const shareSchema = z.object({
   role: z.enum(["viewer", "editor"]),
 });
 
+export const signUpSchema = z.object({
+  name: z.string().trim().min(1, "Enter your name.").max(60, "Name must be 60 characters or fewer."),
+  email: z.email("Enter a valid email address.").trim().toLowerCase(),
+});
+
 export type CreateDocumentInput = z.infer<typeof createDocumentSchema>;
 export type UpdateDocumentInput = z.infer<typeof updateDocumentSchema>;
 export type ShareInput = z.infer<typeof shareSchema>;

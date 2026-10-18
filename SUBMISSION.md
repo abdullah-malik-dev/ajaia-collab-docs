@@ -20,7 +20,7 @@
 
 ## Test accounts
 
-No passwords. Pick a person on the login page.
+No passwords. Pick a person on the login page, or add yourself with any name and email (a known email signs you in as that person).
 
 | User  | Email            | On the Welcome document |
 | ----- | ---------------- | ----------------------- |
@@ -32,18 +32,18 @@ Suggested walkthrough: sign in as Alice, open Welcome, share it; in a private wi
 
 ## Working
 
-- Mock sign-in, dashboard with owned and shared documents, create, inline rename, delete
+- Mock sign-in with seeded users plus a no-password sign-up by name and email, dashboard with owned and shared documents, create, inline rename, delete
 - Rich-text editor (headings, bold, italic, underline, strikethrough, code, links, highlight colours, text alignment, lists, quotes, code blocks, rules, undo/redo), word count
 - Autosave with status and last saved time, 409 conflict detection with "Reload latest", unsaved-changes warning
 - Sharing by email as viewer or editor, role changes, removal; all rules enforced server-side
 - Access requests: viewers can ask for edit access, link holders can ask to view or edit, owner approves or declines in the Share dialog
 - Import of `.txt`, `.md`, `.docx` up to 2 MB as new documents; clear errors for other types and sizes
 - Download as Markdown or HTML; print or save as PDF
-- 36 Vitest tests; production build; deployed on Vercel with Neon Postgres
+- 39 Vitest tests; production build; deployed on Vercel with Neon Postgres
 
 ## Incomplete or simplified
 
-- Authentication is a mock (seeded users, unsigned cookie)
+- Authentication is a mock (seeded users or name-and-email sign-up, no passwords, unsigned cookie)
 - PDF export is the browser's print dialog, not a server-generated file
 - On a conflict, local unsaved edits are discarded when reloading; there is no merge
 - Tables, images and font colours are not supported in the editor or on import

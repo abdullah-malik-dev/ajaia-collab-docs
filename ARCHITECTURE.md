@@ -36,7 +36,7 @@ access_requests  (document_id, user_id) PK, requested_role, status 'pending' | '
 - A user with no access gets 404 from the API, so ids can't be probed programmatically. The document page is the one place that distinguishes "doesn't exist" from "not shared with you": a signed-in user who lands on a real document's URL sees a "You need access" page with a request form, the same trade-off Google Docs makes for people holding a link.
 - **Access requests** flow one way: anyone signed in can ask for `viewer` or `editor` (one open request per user per document, re-asking reopens it), the owner approves or declines from the Share dialog, and approving is an upsert into `document_shares` at the requested role. Asking for a role you already have, or for your own document, is rejected.
 - A viewer attempting an edit gets 403 with a plain-language message. The UI never shows them an editable surface in the first place, but the server does not trust the UI.
-- Authentication is a mock by design: an httpOnly cookie holds a seeded user id. The edge middleware only checks the cookie exists (it can't reach the database); pages and routes verify the user. Swapping in real auth means replacing `getCurrentUser()` in `src/lib/session.ts`.
+- Authentication is a mock by design: an httpOnly cookie holds a user id. Users are either seeded or created from the login page with a name and email, no password; a known email signs in as that person. This keeps the "lightweight login flow" the brief allows while letting a reviewer share with any address. The edge middleware only checks the cookie exists (it can't reach the database); pages and routes verify the user. Swapping in real auth means replacing `getCurrentUser()` in `src/lib/session.ts`.
 
 ## Request flow
 
