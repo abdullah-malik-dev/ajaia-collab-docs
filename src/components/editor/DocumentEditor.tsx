@@ -2,10 +2,10 @@
 
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useState } from "react";
 import type { DocContent } from "@/db/schema";
 import { api } from "@/lib/client-api";
+import { baseExtensions } from "@/lib/editor-extensions";
 import { TITLE_MAX } from "@/lib/validation";
 import { Toolbar } from "./Toolbar";
 import { useAutosave, type SaveStatus } from "./useAutosave";
@@ -25,19 +25,7 @@ type Props = {
 
 const DEFAULT_TITLE = "Untitled document";
 
-/** The scoped feature set: bold, italic, underline, H1-H3, lists, undo/redo. */
-export const extensions = [
-  StarterKit.configure({
-    heading: { levels: [1, 2, 3] },
-    link: false,
-    strike: false,
-    code: false,
-    codeBlock: false,
-    blockquote: false,
-    horizontalRule: false,
-  }),
-  Placeholder.configure({ placeholder: "Start writing…" }),
-];
+const extensions = [...baseExtensions(), Placeholder.configure({ placeholder: "Start writing…" })];
 
 export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
   const [title, setTitle] = useState(doc.title);

@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/AppHeader";
 import { DocumentRow, type RowDoc } from "@/components/dashboard/DocumentRow";
+import { ImportButton } from "@/components/dashboard/ImportButton";
 import { NewDocumentButton } from "@/components/dashboard/NewDocumentButton";
 import { getDb } from "@/db/client";
 import { requireUser } from "@/lib/session";
@@ -29,7 +30,10 @@ export default async function DashboardPage() {
             <h1 className="text-2xl font-semibold tracking-tight">Documents</h1>
             <p className="mt-1 text-ink-muted">Everything you own, and everything shared with you.</p>
           </div>
-          <NewDocumentButton />
+          <div className="flex items-start gap-3">
+            <ImportButton />
+            <NewDocumentButton />
+          </div>
         </div>
 
         <Section title="My documents" count={owned.length}>
