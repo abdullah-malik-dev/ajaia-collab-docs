@@ -16,7 +16,7 @@
 | `AI_LOG.md`         | One line per accepted, changed or rejected AI output, in order        |
 | `SUBMISSION.md`     | This file                                                             |
 | `VIDEO_URL.txt`     | Link to the walkthrough video                                         |
-| `screenshots/`      | Login, dashboard, editor, share dialog, conflict banner, mobile       |
+| `screenshots/`      | Login, dashboard, editor, share dialog, conflict banner, viewer, mobile, access request |
 
 ## Test accounts
 
