@@ -16,7 +16,7 @@
 
 /* Document body. Sizes follow a modest scale so H1 reads as a title, not a banner. */
 .tiptap-editor {
-  @apply min-h-[50vh] text-[17px] leading-7 text-ink;
+  @apply min-h-[50vh] font-serif text-[18px] leading-[1.65] text-ink;
 }
 .tiptap-editor:focus,
 .tiptap-editor:focus-visible {
@@ -51,6 +51,27 @@
 }
 .tiptap-editor li > p {
   @apply m-0;
+}
+.tiptap-editor blockquote {
+  @apply border-l-[3px] border-line-strong pl-4 text-ink-muted;
+}
+.tiptap-editor code {
+  @apply rounded-sm bg-canvas px-1 py-0.5 font-mono text-[0.88em];
+}
+.tiptap-editor pre {
+  @apply overflow-x-auto rounded bg-canvas p-4 font-mono text-[15px] leading-6;
+}
+.tiptap-editor pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
+.tiptap-editor hr {
+  @apply my-8 border-0 border-t border-line-strong;
+}
+.tiptap-editor a {
+  @apply text-accent underline decoration-accent/40 underline-offset-2;
+}
+.tiptap-editor s {
+  @apply text-ink-muted;
 }
 .tiptap-editor p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);

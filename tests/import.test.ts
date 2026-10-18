@@ -40,12 +40,14 @@ describe("markdown import", () => {
     expect(nodes[4].content).toHaveLength(2);
   });
 
-  it("flattens unsupported markdown (links, code) to plain text", async () => {
-    const { content } = await convertUpload({ name: "x.md", bytes: enc.encode("[link](https://a.b) and `code`") });
-    const para = (content.content as Node[])[0];
-    const text = para.content!.map((t) => t.text).join("");
-    expect(text).toBe("link and code");
-    expect(para.content!.every((t) => !t.marks || t.marks.length === 0)).toBe(true);
+  it("keeps links and inline code as marks, and drops unsupported nodes like tables to text", async () => {
+    const md = ["[link](https://a.b) and `code`", "", "| a | b |", "|---|---|", "| 1 | 2 |", ""].join("\n");
+    const { content } = await convertUpload({ name: "x.md", bytes: enc.encode(md) });
+    const nodes = content.content as Node[];
+    const para = nodes[0];
+    expect(para.content!.find((t) => t.text === "link")?.marks?.[0]).toMatchObject({ type: "link", attrs: { href: "https://a.b" } });
+    expect(para.content!.find((t) => t.text === "code")?.marks).toEqual([{ type: "code" }]);
+    expect(nodes.every((n) => n.type !== "table")).toBe(true);
   });
 });
 

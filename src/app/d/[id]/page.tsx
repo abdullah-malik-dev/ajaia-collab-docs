@@ -30,7 +30,7 @@ export default async function DocumentPage({ params }: { params: { id: string } 
       <AppHeader user={user}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm text-ink-muted">
-            <span>{role === "owner" ? "Your document" : `Shared by ${owner?.name ?? "someone"}`}</span>
+            <span className="hidden sm:inline">{role === "owner" ? "Your document" : `Shared by ${owner?.name ?? "someone"}`}</span>
             <RoleBadge role={role} />
           </div>
           {canShare(role) && (

@@ -18,7 +18,7 @@ export type RowDoc = {
 
 export function DocumentRow({ doc }: { doc: RowDoc }) {
   const router = useRouter();
-  const [mode, setMode] = useState<"view" | "rename" | "deleting">("view");
+  const [mode, setMode] = useState<"view" | "rename" | "confirm" | "deleting">("view");
   const [title, setTitle] = useState(doc.title);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +39,6 @@ export function DocumentRow({ doc }: { doc: RowDoc }) {
   }
 
   async function remove() {
-    if (!window.confirm(`Delete "${doc.title}"? This can't be undone.`)) return;
     setMode("deleting");
     try {
       await api(`/api/documents/${doc.id}`, { method: "DELETE" });
@@ -88,12 +87,27 @@ export function DocumentRow({ doc }: { doc: RowDoc }) {
         </div>
       </div>
       {isOwner && mode === "view" && (
-        <div className="flex shrink-0 gap-3 text-sm text-ink-faint opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+        <div className="flex shrink-0 gap-3 text-sm text-ink-faint">
           <button type="button" onClick={() => setMode("rename")} className="hover:text-accent">
             Rename
           </button>
-          <button type="button" onClick={remove} className="hover:text-danger">
+          <button type="button" onClick={() => setMode("confirm")} className="hover:text-danger">
             Delete
+          </button>
+        </div>
+      )}
+      {mode === "confirm" && (
+        <div className="flex shrink-0 items-center gap-2 text-sm">
+          <span className="text-ink-muted">Delete this document?</span>
+          <button
+            type="button"
+            onClick={remove}
+            className="rounded bg-danger px-2.5 py-1 font-medium text-paper hover:opacity-90"
+          >
+            Delete
+          </button>
+          <button type="button" onClick={() => setMode("view")} className="px-1 text-ink-muted hover:text-ink">
+            Keep
           </button>
         </div>
       )}

@@ -1,11 +1,12 @@
 "use client";
 
 import Placeholder from "@tiptap/extension-placeholder";
-import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
+import { EditorContent, useEditor, useEditorState, type Editor, type JSONContent } from "@tiptap/react";
 import { useEffect, useState } from "react";
 import type { DocContent } from "@/db/schema";
 import { api } from "@/lib/client-api";
 import { baseExtensions } from "@/lib/editor-extensions";
+import { countWords } from "@/lib/export";
 import { TITLE_MAX } from "@/lib/validation";
 import { DownloadMenu } from "./DownloadMenu";
 import { Toolbar } from "./Toolbar";
@@ -108,6 +109,9 @@ export function DocumentEditor({ doc, canEdit, ownerName }: Props) {
         <div className="mx-auto min-h-[60vh] max-w-page rounded-sm border border-line bg-paper px-8 py-10 sm:px-16 sm:py-14 print:min-h-0 print:max-w-none print:border-0 print:p-0">
           <EditorContent editor={editor} />
         </div>
+        <div className="mx-auto mt-2 flex max-w-page justify-end px-1 text-xs text-ink-faint print:hidden">
+          {editor && <WordCount editor={editor} />}
+        </div>
       </div>
       {hasUnsavedChanges && <span className="sr-only" aria-live="polite">You have unsaved changes.</span>}
     </div>
@@ -130,7 +134,7 @@ function StatusLabel({
     case "saved":
       return (
         <span className={`${base} text-ink-faint`} title={new Date(lastSavedAt).toLocaleString()}>
-          Saved <SavedTime iso={lastSavedAt} />
+          Saved <span className="hidden sm:inline"><SavedTime iso={lastSavedAt} /></span>
         </span>
       );
     case "dirty":
@@ -149,6 +153,14 @@ function StatusLabel({
     case "conflict":
       return <span className={`${base} text-danger`}>Not saved</span>;
   }
+}
+
+function WordCount({ editor }: { editor: Editor }) {
+  const words = useEditorState({
+    editor,
+    selector: ({ editor: e }) => countWords(e.state.doc.textBetween(0, e.state.doc.content.size, " ", " ")),
+  });
+  return <span>{words === 1 ? "1 word" : `${words} words`}</span>;
 }
 
 /** Rendered after mount only: the local time differs between server and browser. */
