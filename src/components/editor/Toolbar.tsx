@@ -101,7 +101,7 @@ export function Toolbar({ editor }: { editor: Editor }) {
 
   return (
     <div className="relative">
-      <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-x-1 gap-y-1">
+      <div role="toolbar" aria-label="Formatting" className="no-scrollbar -mx-6 flex items-center gap-x-1 overflow-x-auto px-6 sm:mx-0 sm:flex-wrap sm:gap-y-1 sm:overflow-visible sm:px-0">
         <Group>
           {HISTORY.map((item) => (
             <IconButton key={item.title} item={item} state={state} editor={editor} />
@@ -172,7 +172,7 @@ export function Toolbar({ editor }: { editor: Editor }) {
 
 function Group({ children, last }: { children: React.ReactNode; last?: boolean }) {
   return (
-    <div className={`flex items-center gap-0.5 ${last ? "" : "mr-1 border-r border-line pr-1.5"}`}>{children}</div>
+    <div className={`flex shrink-0 items-center gap-0.5 ${last ? "" : "mr-1 border-r border-line pr-1.5"}`}>{children}</div>
   );
 }
 

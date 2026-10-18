@@ -78,6 +78,13 @@
   @apply pointer-events-none float-left h-0 text-ink-faint;
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media print {
   html {
     background: #fff;
