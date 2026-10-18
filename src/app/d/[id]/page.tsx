@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { RoleBadge } from "@/components/RoleBadge";
 import { DocumentEditor } from "@/components/editor/DocumentEditor";
+import { ShareButton } from "@/components/share/ShareDialog";
 import { getDb } from "@/db/client";
-import { canEdit } from "@/lib/access";
+import { canEdit, canShare } from "@/lib/access";
 import { requireUser } from "@/lib/session";
 import { getDocumentForUser } from "@/server/documents";
 import { ServiceError } from "@/server/errors";
@@ -27,9 +28,14 @@ export default async function DocumentPage({ params }: { params: { id: string } 
   return (
     <>
       <AppHeader user={user}>
-        <div className="flex items-center gap-2 text-sm text-ink-muted">
-          <span>{role === "owner" ? "Your document" : `Shared by ${owner?.name ?? "someone"}`}</span>
-          <RoleBadge role={role} />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-ink-muted">
+            <span>{role === "owner" ? "Your document" : `Shared by ${owner?.name ?? "someone"}`}</span>
+            <RoleBadge role={role} />
+          </div>
+          {canShare(role) && (
+            <ShareButton docId={doc.id} docTitle={doc.title} owner={{ name: user.name, email: user.email }} />
+          )}
         </div>
       </AppHeader>
       <DocumentEditor
