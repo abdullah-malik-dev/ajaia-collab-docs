@@ -13,3 +13,46 @@
     @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-paper;
   }
 }
+
+/* Document body. Sizes follow a modest scale so H1 reads as a title, not a banner. */
+.tiptap-editor {
+  @apply min-h-[50vh] text-[17px] leading-7 text-ink;
+}
+.tiptap-editor:focus,
+.tiptap-editor:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.tiptap-editor > * + * {
+  @apply mt-3;
+}
+.tiptap-editor h1 {
+  @apply mt-8 text-3xl font-semibold leading-tight tracking-tight;
+}
+.tiptap-editor h2 {
+  @apply mt-7 text-2xl font-semibold leading-snug tracking-tight;
+}
+.tiptap-editor h3 {
+  @apply mt-6 text-xl font-semibold leading-snug;
+}
+.tiptap-editor > h1:first-child,
+.tiptap-editor > h2:first-child,
+.tiptap-editor > h3:first-child {
+  @apply mt-0;
+}
+.tiptap-editor ul {
+  @apply list-disc pl-6;
+}
+.tiptap-editor ol {
+  @apply list-decimal pl-6;
+}
+.tiptap-editor li + li {
+  @apply mt-1;
+}
+.tiptap-editor li > p {
+  @apply m-0;
+}
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply pointer-events-none float-left h-0 text-ink-faint;
+}
